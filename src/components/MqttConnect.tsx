@@ -29,12 +29,21 @@ const MqttClient: React.FC = () => {
         }
     }, [client]);
 
-    const handleConnect = (hostname: string, username: string, password: string, port: string) => {
-        updateClient(mqtt.connect(`wss://${hostname}:${port}/mqtt`,
+    const handleConnect = (hostname: string, username: string, password: string) => {
+        updateClient(mqtt.connect(
             {
                 username,
                 password,
-                clientId: "mqttjs2_" + Math.random().toString(16).substring(2, 8)
+                clientId: "mqttjs_" + Math.random().toString(16).substring(2, 8),
+                protocol: 'wss',
+                hostname,
+                protocolVersion: 4,
+                port: 8884,
+                path: '/mqtt',
+                clean: true,
+                resubscribe: false,
+                keepalive: 60,
+                reconnectPeriod: 0,
             } as IClientOptions));
     };
 
@@ -45,9 +54,8 @@ const MqttClient: React.FC = () => {
         const hostname = data.get('hostname')?.toString() || '';
         const username = data.get('username')?.toString() || '';
         const password = data.get('password')?.toString() || '';
-        const port = data.get('port')?.toString() || '';
 
-        handleConnect(hostname, username, password, port);
+        handleConnect(hostname, username, password);
     }
 
     return (
@@ -77,14 +85,6 @@ const MqttClient: React.FC = () => {
                         className={inputClassName}
                         required
                         placeholder="Password"
-                    />
-                </div>
-                <div className="mb-6">
-                    <input
-                        type="string"
-                        name="port" className={inputClassName}
-                        placeholder="Port"
-                        required
                     />
                 </div>
                 <button
